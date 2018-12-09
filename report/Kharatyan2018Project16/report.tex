@@ -1,6 +1,7 @@
 \documentclass[12pt,twoside]{article}
 \usepackage{jmlda}
 
+
 \begin{document}
 \title
     {Оценка оптимального объёма выборки для задач классификации}
@@ -42,7 +43,49 @@
 
 Для вычислительного экперимента используются реальные данные 569 пациентов с 30 признаками и метками об опухоли молочной железы: доброкачественная или злокачественная. Как описано выше, будем обучать модели на разных подвыборках и после достижения необходимого уровня устойчивости получим оптимальный объём данных.
 
+
+\section{Постановка задачи классификации}
+
+Пусть у нас задана выборка $D = \left\{ \left( \mathbf { x } _ { i } , y _ { i } \right) : i = 1 , \ldots , m \right\}$ с объёмом $m$ объектов(пациентов), каждый из которых описывается $n$ признаками, $\mathbf { x } _ { i } \in \mathbb { R } ^ { n }$ и принадлежит одному из двух классов: $y _ { i } \in \{ 0,1 \}$ . Модель логистической регрессии предполагает, что вектор целевой переменной $\mathbf { y } = \left[ y _ { 1 } , \dots , y _ { m } \right] ^ { T }$ имеет распределение Бернулли, $y _ { i } \sim \mathscr { B } \left( \theta _ { i } \right)$ с плотностью распределения
+\begin{equation}\label{eq:frst}
+p (  { y } | \boldsymbol { \omega } ) = \prod _ { i = 1 } ^ { m } \theta _ { i } ^ { y _ { i } } \left( 1 - \theta _ { i } \right) ^ { 1 - y _ { i } } 
+\end{equation}
+
+Плотность вероятности зависит от вектора параметров $\omega$. Зная $\omega$, можно вычислить вероятность принадлежности к классу 
+\begin{equation}\label{eq:scnd}
+\theta _ { i } = f \left( \mathbf { x } _ { i } ^ { T } \omega \right) = \frac { 1 } { 1 + \exp \left( - \mathbf { x } _ { i } ^ { T } \omega \right) }
+\end{equation}
+
+Пользуясь принципом максимального правдоподобия, можем вычислить функцию ошибки для уравнения \eqref{eq:frst}
+
+\begin{equation}\label{eq:trd}
+E ( \boldsymbol { \omega } ) = - \ln p ( \mathbf { y } | \boldsymbol { \omega } ) = - \sum _ { i = 1 } ^ { m } \left( y _ { i } \ln \theta _ { i } + \left( 1 - y _ { i } \right) \ln \left( 1 - \theta _ { i } \right) \right)
+\end{equation}
+
+Чтобы найти вектор параметров логистической регрессии $\widehat { \omega }$, необходимо решить оптимизационную задачу:
+
+\begin{equation}\label{eq:frth}
+\hat { \mathbf { \omega } } = \arg \min _ { \mathbf { \omega } \in \mathbb { R } ^ { n } } E ( \mathbf { \omega } )
+\end{equation}
+
+Тогда алгоритм классификации определяется следующим образом:
+
+\begin{equation}\label{eq:fvth}
+a \left( \mathbf { x } , c _ { 0 } \right) = \operatorname { sign } \left( f ( \mathbf { x } , \boldsymbol { \omega } ) - c _ { 0 } \right)
+\end{equation}
+
+где $c _ { 0 }$ - пороговое значение функции активации\cite{motrenko2014sample} .
+
+\section{Постановка задачи определения оптимального объёма выборки}
+Допустим, что задано $m$ объектов выборки $D$. Количество этих объектов недостаточно для обучения устойчивой модели логистической регрессии. Необходимо, имея $m$ объектов, найти такое число $m^ { * } $, что показатель устойчивости модели при увеличении числа $m^ { * } $ меняется незначительно. Задача нахождения данного числа объектов представляется следующим образом:
+
+\begin{equation}\label{eq:sxth}
+m ^ { * } = \min m \in \mathbb { N } \; \;  \forall  k \in \mathbb { N } \rightarrow \rho ( \mathrm { p } ( \boldsymbol { w } | m ^ {*} ) , \mathrm { p } ( \boldsymbol { w } | m ^ {*} + k ) ) < \varepsilon
+\end{equation}
+где $\rho$ - некоторая функция расстояния между распределениями, $\varepsilon$ - заранее заданный порог устойчивости, $\mathrm { p } ( \boldsymbol { w } | m ^ {*} )$
+- распределение весов модели, обученной на выборке размером $m^{*}$.
 \bibliographystyle{jmlda-rus}
 \bibliography{literature}
+
 \end{document}
 \grid
